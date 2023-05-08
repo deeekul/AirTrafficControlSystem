@@ -19,6 +19,8 @@ import ru.vsu.cs.airTrafficControlSystem.util.ErrorResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.vsu.cs.airTrafficControlSystem.util.ErrorsUtil.returnErrorsToClient;
+
 @RestController
 @RequestMapping("/api/planes")
 @Tag(name = "Plane Controller", description = "Взаимодействие с самолётами")
@@ -51,14 +53,8 @@ public class PlaneController {
     @Operation(summary = "Создать новый самолёт ")
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid PlaneDTO planeDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-            for (FieldError error: fieldErrors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new PlaneNotCreatedException(errorMessage.toString());
+            String errorMsg = returnErrorsToClient(bindingResult);
+            throw new PlaneNotCreatedException(errorMsg);
         }
         planeService.addPlane(convertToPlane(planeDTO));
         return ResponseEntity.ok(HttpStatus.OK);
