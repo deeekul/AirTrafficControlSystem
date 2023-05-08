@@ -21,12 +21,11 @@ import ru.vsu.cs.airTrafficControlSystem.services.FlightService;
 import ru.vsu.cs.airTrafficControlSystem.util.ErrorResponse;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static ru.vsu.cs.airTrafficControlSystem.util.ErrorsUtil.returnErrorsToClient;
 
 @RestController
 @RequestMapping("/api/flights")
-@Tag(name = "Flight Controller", description = "Взаимодействие с рейсами")
+@Tag(name = "Flight Controller", description = "Interaction with flights")
 public class FlightController {
     private final FlightService flightService;
     private final AirportService airportService;
@@ -42,7 +41,7 @@ public class FlightController {
     }
 
     @GetMapping
-    @Operation(summary = "Получить рейсы (в теле запроса можно указать airCompany)")
+    @Operation(summary = "Get all flights (you can specify air company in request body)")
     public List<FlightDTO> getFlights(@RequestParam (required = false) String airCompanyName) {
         if (airCompanyName != null) {
             return flightService.getFlightsByAirCompanyName(airCompanyName).stream().map(this::convertToFlightDTO).collect(Collectors.toList());
@@ -51,13 +50,13 @@ public class FlightController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Поулчить рейс по id")
+    @Operation(summary = "Get flight by id")
     public FlightDTO getFlightById(@PathVariable("id") int id) {
         return convertToFlightDTO(flightService.getFlightById(id));
     }
 
     @PostMapping("/create")
-    @Operation(summary = "Создать рейс")
+    @Operation(summary = "Create flight")
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid FlightDTO flightDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMsg = returnErrorsToClient(bindingResult);
@@ -78,14 +77,14 @@ public class FlightController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @Operation(summary = "Удалить рейс")
+    @Operation(summary = "Delete flight")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
         flightService.deleteFlight(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/update/{id}")
-    @Operation(summary = "Обновить рейс")
+    @Operation(summary = "Update flight")
     public ResponseEntity<HttpStatus> update(@PathVariable("id") int id, @RequestBody @Valid FlightDTO flightDTO) {
         flightService.updateFlight(id, convertToFlight(flightDTO));
         return ResponseEntity.ok(HttpStatus.OK);

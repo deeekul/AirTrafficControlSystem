@@ -21,7 +21,7 @@ import static ru.vsu.cs.airTrafficControlSystem.util.ErrorsUtil.returnErrorsToCl
 
 @RestController
 @RequestMapping("/api/air_companies")
-@Tag(name = "AirCompany Controller", description = "Взаимодействие с авиакомпаниями")
+@Tag(name = "AirCompany Controller", description = "Interaction with air companies")
 public class AirCompanyController {
     private final AirCompanyService airCompanyService;
     private final ModelMapper modelMapper;
@@ -33,19 +33,19 @@ public class AirCompanyController {
     }
 
     @GetMapping
-    @Operation(summary = "Получить авиакомпании")
-    public List<AirCompanyDTO> getAirports() {
+    @Operation(summary = "Get air companies")
+    public List<AirCompanyDTO> getAirCompanies() {
         return airCompanyService.getAirCompanies().stream().map(this::convertToAirCompanyDTO).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Поулчить авиакомпанию по id")
+    @Operation(summary = "Get air company by id")
     public AirCompanyDTO getAirCompanyById(@PathVariable("id") int id) {
         return convertToAirCompanyDTO(airCompanyService.getAirCompanyById(id));
     }
 
     @PostMapping("/create")
-    @Operation(summary = "Создать авиакомпанию")
+    @Operation(summary = "Create air company")
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid AirCompanyDTO airCompanyDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMsg = returnErrorsToClient(bindingResult);
@@ -56,14 +56,14 @@ public class AirCompanyController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @Operation(summary = "Удалить авиакомпанию")
+    @Operation(summary = "Delete air company")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
         airCompanyService.deleteAirCompany(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/update/{id}")
-    @Operation(summary = "Обновить авиакомпанию")
+    @Operation(summary = "Update air company")
     public ResponseEntity<HttpStatus> update(@PathVariable("id") int id, @RequestBody @Valid AirCompanyDTO airCompanyDTO) {
         airCompanyService.updateAirCompany(id, convertToAirCompany(airCompanyDTO));
         return ResponseEntity.ok(HttpStatus.OK);

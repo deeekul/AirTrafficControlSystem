@@ -23,7 +23,7 @@ import static ru.vsu.cs.airTrafficControlSystem.util.ErrorsUtil.returnErrorsToCl
 
 @RestController
 @RequestMapping("/api/runways")
-@Tag(name = "Runway Controller", description = "Взаимодействие со взлётно-посадочными полосами")
+@Tag(name = "Runway Controller", description = "Interaction with runways")
 public class RunwayController {
     private final RunwayService runwayService;
     private final ModelMapper modelMapper;
@@ -37,19 +37,19 @@ public class RunwayController {
     }
 
     @GetMapping
-    @Operation(summary = "Получить все ВПП")
+    @Operation(summary = "Get all runways")
     public List<RunwayDTO> getRunways() {
         return runwayService.getRunways().stream().map(this::convertToRunwayDTO).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Получить ВПП по id")
+    @Operation(summary = "Get runway by id")
     public RunwayDTO getRunway(@PathVariable("id") int id) {
         return convertToRunwayDTO(runwayService.getRunwayById(id));
     }
 
     @PostMapping("/create")
-    @Operation(summary = "Создать ВПП")
+    @Operation(summary = "Create runway")
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid RunwayDTO runwayDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMsg = returnErrorsToClient(bindingResult);
@@ -64,14 +64,14 @@ public class RunwayController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @Operation(summary = "Удалить ВПП")
+    @Operation(summary = "Delete runway")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
         runwayService.deleteRunway(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/update/{id}")
-    @Operation(summary = "Обновить ВПП")
+    @Operation(summary = "Update runway")
     public ResponseEntity<HttpStatus> update(@PathVariable("id") int id, @RequestBody RunwayDTO runwayDTO) {
         runwayService.updateRunway(id, convertToRunway(runwayDTO));
         return ResponseEntity.ok(HttpStatus.OK);

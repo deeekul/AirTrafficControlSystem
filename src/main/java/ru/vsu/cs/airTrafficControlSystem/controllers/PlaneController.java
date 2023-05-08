@@ -33,7 +33,7 @@ public class PlaneController {
     }
 
     @GetMapping
-    @Operation(summary = "Получить все самолёты (в теле запроса можно указать model)")
+    @Operation(summary = "Get all planes (в теле запроса можно указать model)")
     public List<PlaneDTO> getPlanes(@RequestParam(required = false) String model) {
         if (model != null) {
             return planeService.getPlanesByModel(model).stream().map(this::convertToPlaneDTO).collect(Collectors.toList());
@@ -42,13 +42,13 @@ public class PlaneController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Получить самолёт по id")
+    @Operation(summary = "Get plane by id")
     public PlaneDTO getPlane(@PathVariable("id") int id) {
         return convertToPlaneDTO(planeService.getPlaneById(id));
     }
 
     @PostMapping("/create")
-    @Operation(summary = "Создать новый самолёт ")
+    @Operation(summary = "Create plane")
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid PlaneDTO planeDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             String errorMsg = returnErrorsToClient(bindingResult);
@@ -59,14 +59,14 @@ public class PlaneController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @Operation(summary = "Удалить самолёт")
+    @Operation(summary = "Delete plane")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
         planeService.deletePlane(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/update/{id}")
-    @Operation(summary = "Обновить самолёт")
+    @Operation(summary = "Update plane")
     public ResponseEntity<HttpStatus> update(@PathVariable("id") int id, @RequestBody PlaneDTO planeDTO) {
         planeService.updatePlane(id, convertToPlane(planeDTO));
         return ResponseEntity.ok(HttpStatus.OK);

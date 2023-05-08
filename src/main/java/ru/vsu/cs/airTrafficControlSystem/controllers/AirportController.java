@@ -22,7 +22,7 @@ import static ru.vsu.cs.airTrafficControlSystem.util.ErrorsUtil.returnErrorsToCl
 
 @RestController
 @RequestMapping("/api/airports")
-@Tag(name = "Airport Controller", description = "Взаимодействие с аэропортами")
+@Tag(name = "Airport Controller", description = "Interaction with airports")
 public class AirportController {
     private final AirportService airportService;
     private final ModelMapper modelMapper;
@@ -34,7 +34,7 @@ public class AirportController {
     }
 
     @GetMapping
-    @Operation(summary = "Получить аэропорты (в теле можно указать location)")
+    @Operation(summary = "Get all airports (you can specify a location in request body)")
     public List<AirportDTO> getAirports(@RequestParam(required = false) String location) {
         if (location != null) {
             return airportService.getAirportsByLocation(location).stream().map(this::convertToAirportDTO).collect(Collectors.toList());
@@ -43,13 +43,13 @@ public class AirportController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Получить аэропорт по id")
+    @Operation(summary = "Get airport by id")
     public AirportDTO getAirportById(@PathVariable("id") int id) {
         return convertToAirportDTO(airportService.getAirportById(id));
     }
 
     @PostMapping("/create")
-    @Operation(summary = "Создать аэропорт")
+    @Operation(summary = "Create airport")
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid AirportDTO airportDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMsg = returnErrorsToClient(bindingResult);
@@ -60,14 +60,14 @@ public class AirportController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @Operation(summary = "Удалить аэропорт")
+    @Operation(summary = "Delete airport")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
         airportService.deleteAirport(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/update/{id}")
-    @Operation(summary = "Обновить аэропорт")
+    @Operation(summary = "Update airport")
     public ResponseEntity<HttpStatus> update(@PathVariable("id") int id, @RequestBody @Valid AirportDTO airportDTO) {
         airportService.updateAirport(id, convertToAirport(airportDTO));
         return ResponseEntity.ok(HttpStatus.OK);
