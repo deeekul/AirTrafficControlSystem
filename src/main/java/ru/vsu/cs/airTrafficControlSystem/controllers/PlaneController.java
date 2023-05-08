@@ -1,5 +1,7 @@
 package ru.vsu.cs.airTrafficControlSystem.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/planes")
+@Tag(name = "Plane Controller", description = "Взаимодействие с самолётами")
 public class PlaneController {
     private final PlaneService planeService;
     private final ModelMapper modelMapper;
@@ -30,16 +33,22 @@ public class PlaneController {
     }
 
     @GetMapping
-    public List<PlaneDTO> getPlanes() {
+    @Operation(summary = "Получить все самолёты (в теле запроса можно указать model)")
+    public List<PlaneDTO> getPlanes(@RequestParam(required = false) String model) {
+        if (model != null) {
+            return planeService.getPlanesByModel(model).stream().map(this::convertToPlaneDTO).collect(Collectors.toList());
+        }
         return planeService.getPlanes().stream().map(this::convertToPlaneDTO).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Получить самолёт по id")
     public PlaneDTO getPlane(@PathVariable("id") int id) {
         return convertToPlaneDTO(planeService.getPlaneById(id));
     }
 
     @PostMapping("/create")
+    @Operation(summary = "Создать новый самолёт ")
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid PlaneDTO planeDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             StringBuilder errorMessage = new StringBuilder();
@@ -56,15 +65,18 @@ public class PlaneController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @Operation(summary = "Удалить самолёт")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
         planeService.deletePlane(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    /*@PutMapping
-    public ResponseEntity<HttpStatus> update(@PathVariable("id") int id) {
-
-    }*/
+    @PatchMapping("/update/{id}")
+    @Operation(summary = "Обновить самолёт")
+    public ResponseEntity<HttpStatus> update(@PathVariable("id") int id, @RequestBody PlaneDTO planeDTO) {
+        planeService.updatePlane(id, convertToPlane(planeDTO));
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 
     @ExceptionHandler
     private ResponseEntity<ErrorResponse> handleException(PlaneNotFoundException e) {
