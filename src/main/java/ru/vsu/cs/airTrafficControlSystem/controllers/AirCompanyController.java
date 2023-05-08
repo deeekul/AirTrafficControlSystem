@@ -15,10 +15,8 @@ import ru.vsu.cs.airTrafficControlSystem.exceptions.AirCompanyNotFoundException;
 import ru.vsu.cs.airTrafficControlSystem.models.AirCompany;
 import ru.vsu.cs.airTrafficControlSystem.services.AirCompanyService;
 import ru.vsu.cs.airTrafficControlSystem.util.ErrorResponse;
-
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static ru.vsu.cs.airTrafficControlSystem.util.ErrorsUtil.returnErrorsToClient;
 
 @RestController

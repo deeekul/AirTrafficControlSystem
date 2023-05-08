@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.vsu.cs.airTrafficControlSystem.dto.RunwayDTO;
 import ru.vsu.cs.airTrafficControlSystem.exceptions.RunwayNotCreatedException;
 import ru.vsu.cs.airTrafficControlSystem.exceptions.RunwayNotFoundException;
+import ru.vsu.cs.airTrafficControlSystem.models.Airport;
 import ru.vsu.cs.airTrafficControlSystem.models.Runway;
+import ru.vsu.cs.airTrafficControlSystem.services.AirportService;
 import ru.vsu.cs.airTrafficControlSystem.services.RunwayService;
 import ru.vsu.cs.airTrafficControlSystem.util.ErrorResponse;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import static ru.vsu.cs.airTrafficControlSystem.util.ErrorsUtil.returnErrorsToClient;
@@ -26,11 +27,13 @@ import static ru.vsu.cs.airTrafficControlSystem.util.ErrorsUtil.returnErrorsToCl
 public class RunwayController {
     private final RunwayService runwayService;
     private final ModelMapper modelMapper;
+    private final AirportService airportService;
 
     @Autowired
-    public RunwayController(RunwayService runwayService, ModelMapper modelMapper) {
+    public RunwayController(RunwayService runwayService, ModelMapper modelMapper, AirportService airportService, AirportController airportController) {
         this.runwayService = runwayService;
         this.modelMapper = modelMapper;
+        this.airportService = airportService;
     }
 
     @GetMapping
@@ -52,7 +55,11 @@ public class RunwayController {
             String errorMsg = returnErrorsToClient(bindingResult);
             throw new RunwayNotCreatedException(errorMsg);
         }
-        runwayService.addRunway(convertToRunway(runwayDTO));
+        Airport airport = airportService.getAirportByNameAndLocation(runwayDTO.getAirportDTO().getName(),
+                                                                    runwayDTO.getAirportDTO().getLocation());
+        Runway runway = convertToRunway(runwayDTO);
+        runway.setAirport(airport);
+        runwayService.addRunway(runway);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

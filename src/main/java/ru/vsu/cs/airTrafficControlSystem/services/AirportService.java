@@ -27,6 +27,11 @@ public class AirportService {
         return airportRepository.findAirportsByLocation(location);
     }
 
+    public Airport getAirportByNameAndLocation(String name, String location) {
+        Optional<Airport> foundAirport = airportRepository.findFirstByNameAndAndLocation(name, location);
+        return foundAirport.orElseThrow(AirportNotFoundException::new);
+    }
+
     public Airport getAirportById(int id) {
         Optional<Airport> foundAirport = airportRepository.findById(id);
         return foundAirport.orElseThrow(AirportNotFoundException::new);

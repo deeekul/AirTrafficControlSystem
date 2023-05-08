@@ -15,9 +15,7 @@ import ru.vsu.cs.airTrafficControlSystem.exceptions.AirportNotFoundException;
 import ru.vsu.cs.airTrafficControlSystem.models.Airport;
 import ru.vsu.cs.airTrafficControlSystem.services.AirportService;
 import ru.vsu.cs.airTrafficControlSystem.util.ErrorResponse;
-
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ru.vsu.cs.airTrafficControlSystem.util.ErrorsUtil.returnErrorsToClient;
@@ -89,7 +87,7 @@ public class AirportController {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    private Airport convertToAirport(AirportDTO airportDTO) {
+    public Airport convertToAirport(AirportDTO airportDTO) {
         return modelMapper.map(airportDTO, Airport.class);
     }
 

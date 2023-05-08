@@ -24,6 +24,10 @@ public class FlightService {
         return flightRepository.findAll();
     }
 
+    public List<Flight> getFlightsByAirCompanyName(String airCompanyName) {
+        return flightRepository.findFlightsByAirCompanyName(airCompanyName);
+    }
+
     public Flight getFlightById(int id) {
         Optional<Flight> foundFlight = flightRepository.findById(id);
         return foundFlight.orElseThrow(FlightNotFoundException::new);

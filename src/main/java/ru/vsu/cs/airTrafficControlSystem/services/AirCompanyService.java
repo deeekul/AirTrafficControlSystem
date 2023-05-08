@@ -29,6 +29,11 @@ public class AirCompanyService {
         return foundAirCompany.orElseThrow(AirCompanyNotFoundException::new);
     }
 
+    public AirCompany getAirCompanyByName(String name) {
+        Optional<AirCompany> foundAirCompany = airCompanyRepository.findByName(name);
+        return foundAirCompany.orElseThrow(AirCompanyNotFoundException::new);
+    }
+
     @Transactional
     public void addAirCompany(AirCompany airCompany) {
         airCompanyRepository.save(airCompany);

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -11,7 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.vsu.cs.airTrafficControlSystem.dto.FlightDTO;
 import ru.vsu.cs.airTrafficControlSystem.exceptions.FlightNotCreatedException;
 import ru.vsu.cs.airTrafficControlSystem.exceptions.FlightNotFoundException;
+import ru.vsu.cs.airTrafficControlSystem.models.AirCompany;
+import ru.vsu.cs.airTrafficControlSystem.models.Airport;
 import ru.vsu.cs.airTrafficControlSystem.models.Flight;
+import ru.vsu.cs.airTrafficControlSystem.services.AirCompanyService;
+import ru.vsu.cs.airTrafficControlSystem.services.AirportService;
 import ru.vsu.cs.airTrafficControlSystem.services.FlightService;
 import ru.vsu.cs.airTrafficControlSystem.util.ErrorResponse;
 import java.util.List;
@@ -24,16 +29,24 @@ import static ru.vsu.cs.airTrafficControlSystem.util.ErrorsUtil.returnErrorsToCl
 @Tag(name = "Flight Controller", description = "Взаимодействие с рейсами")
 public class FlightController {
     private final FlightService flightService;
+    private final AirportService airportService;
+    private final AirCompanyService airCompanyService;
     private final ModelMapper modelMapper;
 
-    public FlightController(FlightService flightService, ModelMapper modelMapper) {
+    @Autowired
+    public FlightController(FlightService flightService, AirportService airportService, AirCompanyService airCompanyService, ModelMapper modelMapper) {
         this.flightService = flightService;
+        this.airportService = airportService;
+        this.airCompanyService = airCompanyService;
         this.modelMapper = modelMapper;
     }
 
     @GetMapping
-    @Operation(summary = "Получить рейсы")
-    public List<FlightDTO> getFlights() {
+    @Operation(summary = "Получить рейсы (в теле запроса можно указать airCompany)")
+    public List<FlightDTO> getFlights(@RequestParam (required = false) String airCompanyName) {
+        if (airCompanyName != null) {
+            return flightService.getFlightsByAirCompanyName(airCompanyName).stream().map(this::convertToFlightDTO).collect(Collectors.toList());
+        }
         return flightService.getFlights().stream().map(this::convertToFlightDTO).collect(Collectors.toList());
     }
 
@@ -50,7 +63,17 @@ public class FlightController {
             String errorMsg = returnErrorsToClient(bindingResult);
             throw new FlightNotCreatedException(errorMsg);
         }
-        flightService.addFlight(convertToFlight(flightDTO));
+        Airport departureAirport = airportService.getAirportByNameAndLocation(flightDTO.getDepartureAirportDTO().getName(),
+                                                                                    flightDTO.getDepartureAirportDTO().getLocation());
+        Airport destinationAirport = airportService.getAirportByNameAndLocation(flightDTO.getDestinationAirportDTO().getName(),
+                                                                                    flightDTO.getDestinationAirportDTO().getLocation());
+        AirCompany airCompany = airCompanyService.getAirCompanyByName(flightDTO.getAirCompanyDTO().getName());
+
+        Flight flight = convertToFlight(flightDTO);
+        flight.setDepartureAirport(departureAirport);
+        flight.setDestinationAirport(destinationAirport);
+        flight.setAirCompany(airCompany);
+        flightService.addFlight(flight);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
